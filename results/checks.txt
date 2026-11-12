@@ -1,0 +1,3 @@
+G FUND MODEL VS TSP, 2003-2025 (23 years): average gap 0.10 points, largest 0.33 (2011), correlation 0.995; compounded TSP 99.1% vs model 101.6%
+
+Month-end and VUSTX checks skipped: no EODHD files in data/raw/eodhd (see fetch_eodhd.py).
