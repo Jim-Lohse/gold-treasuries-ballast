@@ -1,0 +1,250 @@
+# Validation run
+
+Run: 2026-11-12T21:51:32.373533+00:00
+Status: **COMPLETED_WITH_SOURCE_QUALIFICATIONS**
+
+Execution completed with the source qualifications below. This is a reproduction with documented supplemental data, not authentication of every source or exact recovery of the original data vintage.
+
+| Check | Outcome |
+|---|---|
+| Regression tests | passed |
+| Compile Python modules | passed |
+| Build monthly-average returns | passed |
+| Main backtest and walk-forward | passed |
+| Fresh month-end, VUSTX and G Fund checks | passed |
+| SPY vs Shiller tail sensitivity | passed |
+| Gold series vs uploaded November PDF | passed |
+
+## Source qualifications
+
+- The supplied World Bank workbook ends in February 2021. A datasets/gold-prices mirror supplements March 2021-October 2026 (68 months), rounded to whole USD. It is not the exact original 2026 workbook.
+- The mirror overlaps 734 workbook observations; the maximum difference is $0.50, consistent with rounding. Existing workbook values are preserved.
+- The supplied G Fund XLSX cites TSP / Stock Analysis / TSP Folio. It is a user-supplied compilation, not authenticated as a direct tsp.gov export. Only complete annual rows are compared; 2026 YTD is excluded.
+- Historical inputs are revised series, not point-in-time vintages. The monitoring rule is not validated as a trading strategy.
+- The bibliography, historical authorship and pre-registration claims were not independently audited.
+
+## Outputs
+
+- Main monthly-average returns cover 658 months, January 1972-October 2026. Main tables, summary, walk-forward choices and average-versus-month-end comparison are regenerated.
+- Month-end checks cover 441 months. G Fund comparison uses 38 complete years, 1988-2025.
+- `check_stock_tail_sensitivity.csv` contains 48 comparisons; main SPY-tail returns are restored afterward.
+- `check_gold_pdf.csv` compares 11 published gold figures with monthly-series aggregates. Input hashes are recorded in `validation.json`. Licensed raw inputs are not redistributed.
+
+## Execution log
+
+### Regression tests
+
+```text
+test_flat_yield_earns_coupon (test_math.MathTests.test_flat_yield_earns_coupon) ... ok
+test_initial_loss_counts_as_drawdown (test_math.MathTests.test_initial_loss_counts_as_drawdown) ... ok
+test_later_peak_and_real_compounding (test_math.MathTests.test_later_peak_and_real_compounding) ... ok
+test_missing_month_is_rejected (test_math.MathTests.test_missing_month_is_rejected) ... ok
+test_peak_month_is_excluded (test_math.MathTests.test_peak_month_is_excluded) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.006s
+
+OK
+```
+
+### Compile Python modules
+
+```text
+
+```
+
+### Build monthly-average returns
+
+```text
+returns.csv: 658 months, Jan 1972 to Oct 2026; stocks: SPY total return after Jun 2026
+```
+
+### Main backtest and walk-forward
+
+```text
+STOCK FALLS OF 15% OR MORE (%)
+   peak  bottom  stocks  gold  lt_treas    t5  gfund  cash  Gold + G Fund  Gold + G Fund + long Treasury  Gold + long Treasury
+1973-01 1974-12   -39.2 182.1       2.7  10.5   15.1  15.3           85.1                           53.2                  75.1
+1987-08 1987-12   -26.0   5.4       1.7   2.4    3.0   2.0            4.3                            3.5                   3.6
+2000-08 2003-02   -41.6  30.8      31.7  28.0   13.2   7.9           22.0                           25.3                  31.7
+2007-10 2009-03   -49.0  22.5      21.5  15.8    5.2   2.3           14.4                           17.2                  23.1
+2020-02 2020-03   -18.9  -0.3       9.8   3.6    0.1   0.1           -0.1                            3.2                   4.7
+2021-12 2022-10   -19.3  -7.0     -28.2 -10.8    2.2   1.0           -2.4                          -11.7                 -18.1
+
+STOCK FALLS OF 10% TO 15% (%)
+   peak  bottom  stocks  gold  lt_treas   t5  gfund  cash  Gold + G Fund  Gold + G Fund + long Treasury  Gold + long Treasury
+1976-12 1978-02   -10.4  33.0      -0.3  1.0    8.9   6.3           20.7                           13.4                  15.6
+1981-04 1982-03   -13.4 -33.4      11.4 14.1   14.0  13.3          -12.2                           -4.5                 -12.9
+1990-07 1990-10   -13.9   5.0      -1.2  2.1    2.2   1.9            3.7                            2.1                   2.1
+1998-07 1998-09   -11.5  -1.3       5.8  4.6    0.9   0.8           -0.2                            1.8                   2.2
+2018-09 2018-12   -11.1   4.3       2.3  1.7    0.8   0.6            2.5                            2.5                   3.3
+2025-02 2025-04   -10.9  11.2       0.6  2.3    0.7   0.7            5.9                            4.1                   5.9
+
+HIGH-INFLATION STRETCHES, RETURNS AFTER INFLATION (%)
+  start     end  prices_rose  stocks  gold  lt_treas  gfund  Gold + G Fund  Gold + G Fund + long Treasury  Gold + long Treasury
+1973-04 1982-08        125.1   -33.0  91.8     -36.6    6.7           56.3                           19.5                  22.2
+1990-08 1991-02          3.3    -0.5  -2.8       6.4    1.7           -0.5                            1.9                   2.0
+2021-06 2023-02         12.3   -10.5 -10.7     -27.9   -7.0           -8.7                          -15.4                 -19.5
+
+WHOLE PORTFOLIO, 1972-2026 (%)
+ stock_weight                       ballast  yearly_return  real_yearly_return  volatility  worst_drawdown  return_to_drawdown
+          0.9                 Gold + G Fund           10.9                 6.7        11.3           -44.4                0.25
+          0.9 Gold + G Fund + long Treasury           10.9                 6.7        11.3           -44.3                0.25
+          0.9          Gold + long Treasury           11.0                 6.8        11.3           -44.0                0.25
+          0.9        Gold + 5-year Treasury           10.9                 6.7        11.3           -44.1                0.25
+          0.9                   G Fund only           10.7                 6.5        11.2           -45.0                0.24
+          0.9                     Gold only           11.1                 6.9        11.4           -43.9                0.25
+          0.9            Long Treasury only           10.8                 6.6        11.4           -44.1                0.24
+          0.9                     Cash only           10.6                 6.4        11.2           -45.1                0.23
+          0.8                 Gold + G Fund           10.7                 6.5        10.1           -39.5                0.27
+          0.8 Gold + G Fund + long Treasury           10.6                 6.4        10.1           -39.2                0.27
+          0.8          Gold + long Treasury           10.7                 6.6        10.3           -38.5                0.28
+          0.8        Gold + 5-year Treasury           10.6                 6.5        10.2           -38.9                0.27
+          0.8                   G Fund only           10.3                 6.1        10.0           -40.6                0.25
+          0.8                     Gold only           11.0                 6.9        10.6           -38.4                0.29
+          0.8            Long Treasury only           10.4                 6.2        10.3           -38.7                0.27
+          0.8                     Cash only            9.9                 5.8        10.0           -41.0                0.24
+          0.7                 Gold + G Fund           10.4                 6.2         9.1           -34.2                0.30
+          0.7 Gold + G Fund + long Treasury           10.3                 6.1         9.0           -33.8                0.30
+          0.7          Gold + long Treasury           10.5                 6.3         9.3           -32.6                0.32
+          0.7        Gold + 5-year Treasury           10.3                 6.2         9.2           -33.2                0.31
+          0.7                   G Fund only            9.8                 5.7         8.8           -36.0                0.27
+          0.7                     Gold only           10.9                 6.7        10.2           -32.4                0.34
+          0.7            Long Treasury only           10.0                 5.8         9.4           -33.0                0.30
+          0.7                     Cash only            9.3                 5.2         8.8           -36.6                0.25
+          1.0                   100% stocks           11.2                 7.0        12.5           -49.0                0.23
+          0.6      60/40 (10-year Treasury)            9.4                 5.2         8.1           -27.0                0.35
+
+RATE REGIMES, 80/20 (%)
+                 regime                       ballast  yearly_return  real_yearly_return  volatility  worst_drawdown  return_to_drawdown
+ 1972-1981 rates rising                 Gold + G Fund            8.9                 0.2        11.2           -25.6                0.35
+ 1972-1981 rates rising Gold + G Fund + long Treasury            7.7                -0.9        11.1           -27.7                0.28
+ 1972-1981 rates rising          Gold + long Treasury            8.1                -0.6        11.5           -26.7                0.30
+ 1972-1981 rates rising        Gold + 5-year Treasury            8.5                -0.2        11.4           -26.1                0.32
+ 1972-1981 rates rising                   G Fund only            6.9                -1.7        10.6           -30.7                0.23
+ 1972-1981 rates rising                     Gold only           10.9                 2.0        12.5           -25.0                0.44
+ 1972-1981 rates rising            Long Treasury only            5.3                -3.2        11.1           -33.8                0.16
+ 1972-1981 rates rising                     Cash only            6.7                -1.8        10.6           -30.7                0.22
+1981-2020 rates falling                 Gold + G Fund           10.4                 7.6        10.0           -39.5                0.26
+1981-2020 rates falling Gold + G Fund + long Treasury           10.8                 7.9        10.0           -39.2                0.28
+1981-2020 rates falling          Gold + long Treasury           10.9                 8.1        10.1           -38.5                0.28
+1981-2020 rates falling        Gold + 5-year Treasury           10.6                 7.7        10.0           -38.9                0.27
+1981-2020 rates falling                   G Fund only           10.6                 7.7        10.0           -40.6                0.26
+1981-2020 rates falling                     Gold only           10.3                 7.4        10.2           -38.4                0.27
+1981-2020 rates falling            Long Treasury only           11.6                 8.7        10.2           -38.7                0.30
+1981-2020 rates falling                     Cash only           10.2                 7.3        10.0           -41.0                0.25
+ 2020-2026 rates rising                 Gold + G Fund           14.8                10.0         9.1           -16.0                0.92
+ 2020-2026 rates rising Gold + G Fund + long Treasury           13.7                 8.9         9.3           -17.7                0.77
+ 2020-2026 rates rising          Gold + long Treasury           13.7                 8.9         9.5           -19.0                0.72
+ 2020-2026 rates rising        Gold + 5-year Treasury           14.4                 9.6         9.2           -17.2                0.84
+ 2020-2026 rates rising                   G Fund only           13.7                 8.9         8.8           -15.2                0.90
+ 2020-2026 rates rising                     Gold only           16.0                11.1         9.6           -17.0                0.94
+ 2020-2026 rates rising            Long Treasury only           11.4                 6.8         9.7           -21.1                0.54
+ 2020-2026 rates rising                     Cash only           13.6                 8.9         8.8           -15.4                0.88
+
+WALK-FORWARD 1987-2025, 80/20 (%)
+                             approach  yearly_return  real_yearly_return  volatility  worst_drawdown  return_to_drawdown
+Re-chosen yearly, all data since 1972           10.2                 7.2        10.0           -39.1                0.26
+ Re-chosen yearly, last 15 years only           10.3                 7.3        10.1           -38.7                0.27
+                 Gold + G Fund, fixed           10.2                 7.2        10.0           -39.5                0.26
+ Gold + G Fund + long Treasury, fixed           10.3                 7.2         9.9           -39.2                0.26
+          Gold + long Treasury, fixed           10.4                 7.4        10.0           -38.5                0.27
+                   G Fund only, fixed           10.0                 7.0        10.0           -40.6                0.25
+                     Gold only, fixed           10.5                 7.5        10.1           -38.4                0.27
+
+STOCK / LONG-TREASURY 36-MONTH CORRELATION AT YEAR-END (monthly averages)
+1975    0.26
+1976    0.40
+1977    0.47
+1978    0.49
+1979    0.47
+1980    0.10
+1981    0.17
+1982    0.30
+1983    0.56
+1984    0.57
+1985    0.47
+1986    0.56
+1987    0.14
+1988    0.15
+1989    0.03
+1990    0.65
+1991    0.54
+1992    0.57
+1993    0.36
+1994    0.51
+1995    0.63
+1996    0.53
+1997    0.41
+1998   -0.01
+1999    0.07
+2000   -0.12
+2001   -0.06
+2002   -0.25
+2003   -0.20
+2004   -0.12
+2005    0.15
+2006    0.11
+2007   -0.13
+2008   -0.08
+2009   -0.11
+2010   -0.15
+2011   -0.44
+2012   -0.77
+2013   -0.71
+2014   -0.52
+2015   -0.29
+2016   -0.26
+2017   -0.24
+2018   -0.19
+2019   -0.29
+2020   -0.56
+2021   -0.56
+2022   -0.07
+2023    0.58
+2024    0.56
+2025    0.24
+2026    0.12
+```
+
+### Fresh month-end, VUSTX and G Fund checks
+
+```text
+G FUND MODEL VS TSP, 1988-2025 (38 years), source: user-supplied XLSX (heading cites TSP / Stock Analysis / TSP Folio; not verified as a direct TSP export): average absolute gap 0.10 points; largest 0.33 (2011); correlation 0.998; compounded TSP 445.6% vs model 448.7%
+Month-end rebuild PASSED: 441 complete months, Feb 1990-Oct 2026.
+
+MONTH-END STOCK FALLS OF 10%+ (%)
+   peak  bottom  stocks  Gold + G Fund  Gold + G Fund + long Treasury  Gold + long Treasury
+1990-05 1990-10   -14.6            4.2                            3.4                   3.3
+1998-06 1998-08   -15.3           -3.0                           -0.6                  -1.3
+2000-08 2002-09   -44.7           14.2                           19.5                  23.7
+2007-10 2009-02   -50.8           12.9                           14.8                  19.2
+2018-09 2018-12   -13.5            4.2                            4.4                   6.2
+2019-12 2020-03   -19.4            2.6                            8.4                  12.5
+2021-12 2022-09   -23.9           -3.7                          -11.6                 -17.9
+Month-end 36-month correlation, Oct 2026: 0.39
+VUSTX check, 441 months: correlation 0.987; CAGR fund 5.45% / model 5.57%
+  1998-06 to 1998-08: VUSTX +4.3% / model +4.3%
+  2000-08 to 2002-09: VUSTX +30.5% / model +29.9%
+  2007-10 to 2009-02: VUSTX +15.6% / model +16.8%
+  2019-12 to 2020-03: VUSTX +20.8% / model +20.6%
+  2021-12 to 2022-09: VUSTX -28.7% / model -26.0%
+Index plus dividends vs SPY: CAGR gap +0.07 percentage points (405 months).
+```
+
+### SPY vs Shiller tail sensitivity
+
+```text
+returns.csv: 658 months, Jan 1972 to Oct 2026; stocks: Shiller price with last dividend carried forward after Jun 2026 (monthly-average sensitivity or no SPY file)
+Sensitivity passed: 48 portfolio/period comparisons; main returns restored.
+```
+
+### Gold series vs uploaded November PDF
+
+```text
+Gold PDF check passed: 11 observations, max gap $0.67.
+```
+
+## Reproduce
+
+Provide the sources documented in `data/raw/README.md`, then run `python code/validate.py`. Exit code 2 indicates missing inputs; exit code 1 indicates a failed calculation or check.

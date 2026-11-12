@@ -2,6 +2,8 @@
 
 Data through October 2026. Written November 2026.
 
+**Validation status, November 12, 2026:** The full backtest, walk-forward test, month-end checks and stock-tail sensitivity were rerun. Source qualification: the supplied World Bank workbook ends in February 2021; March 2021-October 2026 uses a documented public mirror rounded to whole dollars, checked against the workbook overlap and the uploaded November 2026 Pink Sheet. The G Fund workbook is a supplied compilation citing TSP, Stock Analysis and TSP Folio, not authenticated as a direct TSP export. See [validation report](results/validation.md).
+
 This note is research for discussion. It is not investment advice.
 
 © 2026 Jaime "Jim" Lohse, all rights reserved; quoted/cited third-party material belongs to its owners.
@@ -18,8 +20,8 @@ A common ballast mix is gold plus a fund that holds Treasuries but cannot lose v
 - Adding long-term Treasuries helped a little in drops driven by recession and fear, such as 2000–03, 2007–09 and 2020. It hurt badly in 2022, the one drop driven by inflation and rising rates. In that drop the three-way mix fell 11.7%.
 - In the 1973–82 inflation, gold rose 93% after inflation and long Treasuries lost 37%. In the 2021–23 inflation, everything lost ground to inflation. The G Fund lost least (−7%) and long Treasuries lost most (−28%).
 - In a portfolio of 80% stocks and 20% ballast, the gold and Treasury mixes all returned between 10.3% and 11.0% a year from 1972 to 2026, less than one point apart.
-- A walk-forward test chose the best mix each year using only the data available at the time. It did no better than gold plus the G Fund.
-- Long Treasuries protect a stock portfolio only when they move opposite to stocks. That relationship has changed sign before, and it has been positive since 2023. On month-end prices, its 36-month reading was 0.39 in October 2026.
+- A walk-forward test chose the best mix each year using earlier-dated observations. It showed little improvement over gold plus the G Fund in this sample; the 15-year version had a slightly higher return and smaller drawdown. The input data are revised historical series, not point-in-time vintages.
+- Long Treasuries provided stronger crash protection in several growth scares, but failed during the 2022 rate shock. A negative trailing correlation alone does not guarantee protection in the next crash. That relationship has changed sign before, and it has been positive since 2023. On month-end prices, its 36-month reading was 0.39 in October 2026.
 - The weak spot of gold plus the G Fund is a crash in which gold falls too. That happened in 1981–82, when gold fell 34% and the mix lost 12%. Long Treasuries would have cut that loss to about 5%.
 
 ## Terms used
@@ -56,12 +58,12 @@ Eight ballast mixes were tested inside portfolios of 90/10, 80/20 and 70/30 stoc
 
 | Crash | Stocks | Gold | Long Treasury | G Fund | Gold + G Fund | Gold + G Fund + long Treasury |
 |---|---|---|---|---|---|---|
-| Jan 1973 – Dec 1974 | −39.2% | +183.1% | +2.7% | +15.1% | +85.3% | +53.4% |
-| Aug 1987 – Dec 1987 | −26.0% | +5.4% | +1.7% | +3.0% | +4.2% | +3.5% |
-| Aug 2000 – Feb 2003 | −41.6% | +31.0% | +31.7% | +13.2% | +22.1% | +25.4% |
-| Oct 2007 – Mar 2009 | −49.0% | +22.4% | +21.5% | +5.2% | +14.3% | +17.2% |
-| Feb 2020 – Mar 2020 | −18.9% | −0.3% | +9.8% | +0.1% | −0.1% | +3.2% |
-| Dec 2021 – Oct 2022 | −19.3% | −7.0% | −28.2% | +2.2% | −2.4% | −11.7% |
+| Jan 1973 – Dec 1974 | −39.2% | 182.1% | 2.7% | 15.1% | 85.1% | 53.2% |
+| Aug 1987 – Dec 1987 | −26.0% | 5.4% | 1.7% | 3.0% | 4.3% | 3.5% |
+| Aug 2000 – Feb 2003 | −41.6% | 30.8% | 31.7% | 13.2% | 22.0% | 25.3% |
+| Oct 2007 – Mar 2009 | −49.0% | 22.5% | 21.5% | 5.2% | 14.4% | 17.2% |
+| Feb 2020 – Mar 2020 | −18.9% | −0.3% | 9.8% | 0.1% | −0.1% | 3.2% |
+| Dec 2021 – Oct 2022 | −19.3% | −7.0% | −28.2% | 2.2% | −2.4% | −11.7% |
 
 Mixes are rebalanced monthly, so a mix's return is not the simple average of its parts.
 
@@ -82,8 +84,8 @@ Smaller drops (10% to 15%) tell the same story, with one exception. From April 1
 
 | Stretch | Prices rose | Stocks | Gold | Long Treasury | G Fund | Gold + G Fund | Gold + G Fund + long Treasury |
 |---|---|---|---|---|---|---|---|
-| Apr 1973 – Aug 1982 | 125.1% | −33.0% | +92.5% | −36.6% | +6.7% | +56.5% | +19.7% |
-| Aug 1990 – Feb 1991 | 3.3% | −0.5% | −2.9% | +6.4% | +1.7% | −0.5% | +1.9% |
+| Apr 1973 – Aug 1982 | 125.1% | −33.0% | 91.8% | −36.6% | 6.7% | 56.3% | 19.5% |
+| Aug 1990 – Feb 1991 | 3.3% | −0.5% | −2.8% | 6.4% | 1.7% | −0.5% | 1.9% |
 | Jun 2021 – Feb 2023 | 12.3% | −10.5% | −10.7% | −27.9% | −7.0% | −8.7% | −15.4% |
 
 ### Whole portfolio, 80% stocks and 20% ballast, January 1972 to October 2026
@@ -98,8 +100,8 @@ Smaller drops (10% to 15%) tell the same story, with one exception. From April 1
 | Gold only | 11.0% | −38.4% |
 | Long Treasury only | 10.4% | −38.7% |
 | Cash only | 9.9% | −41.0% |
-| 100% stocks (reference) | 11.2% | −49.0% |
-| 60/40 (reference) | 9.4% | −27.0% |
+| 100% stocks | 11.2% | −49.0% |
+| 60/40 (10-year Treasury) | 9.4% | −27.0% |
 
 The results depend heavily on the rate cycle. Long Treasuries alone were the best ballast from October 1981 to July 2020, when rates mostly fell (11.6% a year at 80/20). They were the worst ballast in both periods when rates mostly rose: 1972–81 (5.3%) and August 2020 to October 2026 (11.4%, against 14.8% for gold plus the G Fund).
 
@@ -109,13 +111,13 @@ Each year, the test chose the mix of gold, G Fund and long Treasury (in 10% step
 
 | Approach | Yearly return | Worst drawdown |
 |---|---|---|
-| Re-chosen each year, using all data since 1972 | 10.2% | −39.1% |
-| Re-chosen each year, using only the last 15 years | 10.3% | −38.7% |
+| Re-chosen yearly, all data since 1972 | 10.2% | −39.1% |
+| Re-chosen yearly, last 15 years only | 10.3% | −38.7% |
 | Gold + G Fund, fixed | 10.2% | −39.5% |
 | Gold + G Fund + long Treasury, fixed | 10.3% | −39.2% |
 | Gold + long Treasury, fixed | 10.4% | −38.5% |
 
-The 15-year version chased whatever had just worked. It held only long Treasuries from 1993 to 2009 and only gold from 2011 to 2023, and it ended in the same place as the fixed mixes. Choosing in real time added nothing.
+The 15-year version chased whatever had just worked. It held only long Treasuries from 1993 to 2009 and only gold from 2011 to 2023, and produced results close to the fixed mixes. Compared with fixed gold plus the G Fund, its annualized return was about 0.10 percentage point higher and its maximum drawdown about 0.8 percentage point smaller. This does not establish a robust advantage. The walk-forward test enforces chronological training windows but does not reproduce historical data-release timing or eliminate design-selection bias.
 
 ### How stocks and long Treasuries moved together
 
@@ -135,11 +137,11 @@ Monthly averages make crashes look smaller. The tests were rerun on month-end pr
 | Dec 2019 – Mar 2020 | −19.4% | +2.6% | +8.4% |
 | Dec 2021 – Sep 2022 | −23.9% | −3.7% | −11.6% |
 
-At 80/20, worst drawdowns were about two points deeper on month-end prices for every mix (for example −41.4% for gold plus the G Fund and −41.2% with long Treasuries added). The order of the mixes did not change.
+At 80/20, the freshly rebuilt month-end worst drawdowns were −41.4% for gold plus the G Fund and −41.2% with long Treasuries added. The regenerated average-versus-month-end comparison is in `results/check_monthend_vs_average_80_20.csv`; its prior version is archived.
 
 ## When to rerun this test
 
-The finding against adding long Treasuries rests on the recent positive stock-bond correlation. It should be rerun if that changes.
+The proposed monitoring rule below is a research heuristic, not a validated trading strategy. Recent positive stock-bond correlation motivates reviewing the test if that relationship changes. The thresholds have not been tested out of sample as a timing rule.
 
 - Check: at each quarter-end.
 - Inputs: the 36-month correlation of month-end S&P 500 total returns and 20-year Treasury returns (FRED series DGS20), and the 12-month change in consumer prices (FRED series CPIAUCSL).
@@ -150,7 +152,7 @@ The finding against adding long Treasuries rests on the recent positive stock-bo
 | Correlation above 0 | No rerun |
 | Correlation 0 to −0.2, inflation under 3% | Watch; no rerun |
 | Correlation below −0.2 and inflation under 3%, two quarter-ends in a row | Rerun this test |
-| Inflation above 5% | No rerun; in these stretches long Treasuries did worst |
+| Inflation above 5% | Review inflation and rate-shock risk; long Treasuries lost real value in two of the three historical stretches, but gained 6.4% in 1990–91 |
 
 The 3% inflation cut-off follows earlier work. Seydl and Manoukian (2024) put the inflation level that flips the stock-bond correlation at around 3%. Molenaar, Sénéchal, Swinkels and Wang (2024) find that inflation and real interest rates drive the correlation, and Robeco's summary of that study says it expects a negative correlation when inflation is under 3% and real rates are normal. Brixton et al. (2023) add that what matters is how uncertain inflation is relative to growth, not the level of inflation itself, so the cut-off is a simple, observable stand-in.
 
@@ -168,22 +170,25 @@ These findings line up with published work. Where they overlap, the earlier work
 ## Files and how to rerun
 
 - `code/` holds the Python scripts. `results/` holds every table above as a CSV file, plus `summary.txt` and `checks.txt`.
-- The source data is not included. `data/raw/README.md` lists each file and where to get it.
+- Raw source data is not included. `data/raw/README.md` lists each file and where to get it.
+- Download the Shiller, World Bank and TSP files listed in `data/raw/README.md` first. FRED fetching alone is insufficient. For the published SPY tail and all month-end checks, also obtain the EODHD files using your own key.
 - To rerun, with Python 3.11 or later:
 
 ```
 pip install -r requirements.txt
 python code/fetch_fred.py        # Treasury yields and inflation from FRED
+python code/fetch_eodhd.py        # requires EODHD_API_KEY; licensed data
 python code/build_returns.py     # monthly returns, Jan 1972 - Oct 2026
 python code/backtest.py          # crashes, inflation stretches, portfolios, walk-forward
-python code/checks.py            # G Fund vs TSP; month-end and VUSTX checks if EODHD files are present
+python code/validate.py          # complete rebuild, checks, sensitivity and provenance
+python -m unittest discover -s tests -v
 ```
 
 ## Appendix A: Method
 
 - All returns are monthly and in US dollars, January 1972 to October 2026 (658 months). The US stopped exchanging dollars for gold in August 1971, so 1972 is the first full year after that.
-- Stocks: S&P 500 monthly average price plus dividends from Robert Shiller's data through June 2026, then SPY (an S&P 500 fund) total return from July to October 2026.
-- Gold: World Bank monthly average price.
+- Stocks: S&P 500 monthly average price plus dividends from Robert Shiller's data through June 2026, then SPY (an S&P 500 fund) month-end total return from July to October 2026. This mixes measurement conventions. Run `python code/build_returns.py --stock-tail shiller` and rerun the backtest for a sensitivity check using monthly-average prices and the last known dividend carried forward; the completed sensitivity is in `results/check_stock_tail_sensitivity.csv`. Across 70/30, 80/20 and 90/10 portfolios, the alternate tail changes full-history CAGR by approximately 0.04-0.05 percentage points and August 2020-October 2026 CAGR by 0.31-0.42 percentage points.
+- Gold: World Bank monthly average price from the supplied workbook through February 2021; a public World Bank mirror supplements the following 68 months through October 2026. The supplement is rounded to whole USD, not the exact original full-precision 2026 workbook.
 - Long Treasury: a 20-year bond rebuilt each month. It is bought at par with a coupon equal to last month's yield, then repriced at this month's yield with 20 years minus one month left. Coupons are semiannual. FRED has no 20-year yield from January 1987 to September 1993, so the 30-year yield fills that gap.
 - 5-year and 10-year Treasuries: rebuilt the same way from FRED's 5-year and 10-year yields.
 - G Fund: earns, each month, last month's average of the 5-year, 10-year and 20-year Treasury yields, and its price never falls. This mirrors the G Fund's rule of paying a rate based on longer-term Treasury yields.
@@ -197,10 +202,12 @@ python code/checks.py            # G Fund vs TSP; month-end and VUSTX checks if 
 Data
 
 - [D1] Shiller, Robert J. Stock market data (ie_data.xls), downloaded November 2026. https://shillerdata.com/
-- [D2] World Bank. Commodity Price Data (The Pink Sheet), CMO-Historical-Data-Monthly.xlsx, updated November 3, 2026, and the November 2026 Pink Sheet. https://www.worldbank.org/en/research/commodity-markets
+- [D2] World Bank. Commodity Price Data (The Pink Sheet): supplied historical workbook updated March 2, 2021 (through February 2021), and supplied November 2026 Pink Sheet PDF. https://www.worldbank.org/en/research/commodity-markets
 - [D3] Federal Reserve Bank of St. Louis, FRED: GS5, GS10, GS20, GS30, DGS5, DGS10, DGS20, DGS30, TB3MS, CPIAUCSL. https://fred.stlouisfed.org/
 - [D4] EOD Historical Data (EODHD): gold month-end prices (XAUUSD), S&P 500 index (GSPC), SPY and Vanguard Long-Term Treasury Fund (VUSTX) month-end prices. Licensed data; not included in this repository.
-- [D5] Thrift Savings Plan. G Fund annual rates of return, 2003 to October 2026, exported from tsp.gov, November 2026. https://www.tsp.gov/rates-return/
+- [D5] User-supplied G Fund XLSX compilation, labeled as of November 2026, citing TSP / Stock Analysis / TSP Folio. Complete annual rows 1988-2025 used; 2026 YTD excluded. The primary publication is: https://www.tsp.gov/rates-return/
+
+- [D6] DataHub / datasets, public gold-price mirror (1960 onward attributed to World Bank Pink Sheet). Used only for March 2021-October 2026; values rounded to whole USD. https://github.com/datasets/gold-prices/blob/main/data/monthly.csv
 
 Research
 
@@ -221,18 +228,20 @@ Research
 
 Checks
 
+- Original-output reconciliation: the prior 80/20 cash-ballast CAGR was 9.9741%, matching the carried-dividend Shiller-tail sensitivity; the documented SPY-tail rerun is 9.9338%. This supports a stock-tail mismatch between the old narrative and outputs. All main tables now use the documented SPY tail consistently. Small gold differences also reflect the older workbook vintage and rounded supplemental series.
+
 - Shiller data: the original file was compared with an earlier public copy. Prices matched in 666 of 669 months (January 1971 to September 2026), and dividends matched in all 630 months the copy covers (to June 2023). The test uses the original file.
-- Gold: the World Bank file was compared with an earlier public copy for all 670 months from January 1971 to October 2026. One month differed: August 2000, by $0.47 an ounce. Eleven figures in the November 2026 Pink Sheet also matched within $1. The test uses the World Bank file.
-- G Fund rebuild against the TSP's own published annual returns, 2003 to 2025 (23 years): average gap 0.10 points a year; largest gap 0.33 points (2011); correlation 0.995. Over the whole period the TSP figures compound to 99.1% and the rebuild to 101.6%. Selected years, rebuild vs TSP: 2008 3.81% vs 3.75%; 2020 1.01% vs 0.97%; 2022 2.94% vs 2.98%; 2025 4.44% vs 4.44%. The rebuild ran slightly high in 2009–2014, likely because it gives the 20-year yield more weight than the G Fund's own formula does, and long yields sat well above shorter ones in those years.
+- Gold: the supplied workbook has 734 overlapping months with the mirror, January 1960-February 2021. All agree within $0.50 per ounce, consistent with the mirror's whole-dollar rounding. The workbook values are retained. Eleven annual, quarterly and monthly figures in the uploaded November 2026 Pink Sheet match the reconstructed series within $1 (maximum $0.67). The supplement is therefore cross-checked but remains a third-party copy with less precision.
+- G Fund rebuild against the supplied annual-return workbook, 1988-2025 (38 complete years): average absolute gap 0.10 percentage points; largest gap 0.33 points (2011); correlation 0.998. The reference compounds to 445.6% and the rebuild to 448.7%. The supplied workbook cites TSP / Stock Analysis / TSP Folio, so this compares the model with the supplied compilation; it does not authenticate it as a direct TSP export. The 2026 YTD row is excluded.
 - Long Treasury rebuild against VUSTX, February 1990 to October 2026 (441 months, month-end): correlation 0.987; yearly return 5.57% for the rebuild vs 5.45% for the fund. In crash windows the two were within about one point, except 2022, when the fund lost 28.7% and the rebuild 26.0%. The rebuild therefore makes long Treasuries look slightly better than the fund did in a rate shock.
-- Stocks: the S&P 500 index plus dividends and SPY differed by 0.22% a year on average from 1993 to 2026.
+- Stocks: the fresh check compares compound annual growth rates over 405 overlapping months through October 2026. The S&P 500 index plus estimated dividends exceeded SPY by 0.07 percentage points a year. This replaces the previously stated 0.22%, whose calculation was not present in the original scripts.
 
 Limits
 
-- The main test uses monthly averages throughout, which make crashes look smaller. For example, it shows the 2007–09 fall as −49%, against about −51% on month-end prices. Month-end gold prices were available only from 1990, so 1972 to 1989 rests on averages alone.
+- The main test uses monthly averages except for the disclosed SPY tail, which make crashes look smaller. For example, it shows the 2007–09 fall as −49%, against about −51% on month-end prices. Month-end gold prices were available only from 1990, so 1972 to 1989 rests on averages alone.
 - Six crashes of 15% or more is a small sample.
 - The test uses US stocks only. A portfolio with large international or sector-heavy holdings could behave differently.
-- The G Fund is open only to TSP members. Its rebuild is a model, checked against the TSP's published returns for 2003 to 2025 only.
+- The G Fund is open only to TSP members. Its rebuild is a model, compared against the supplied annual-return compilation for 1988 to 2025 only.
 - No trading costs, fund fees or taxes are included, except as already in SPY and VUSTX prices.
 
 ## Appendix D: How this was built

@@ -2,6 +2,8 @@
 Main test uses monthly averages (Shiller, World Bank, FRED monthly series).
 Output: data/work/returns.csv"""
 import sys
+import argparse
+import json
 import numpy as np
 import openpyxl
 import pandas as pd
@@ -34,7 +36,24 @@ def load_gold():
     for r in rows[header + 2:]:
         if r[0] and isinstance(r[col], (int, float)):
             out[pd.Timestamp(int(r[0][:4]), int(r[0][5:7]), 1)] = float(r[col])
-    return pd.Series(out).sort_index()
+    original = pd.Series(out).sort_index()
+    mirror_path = RAW / "worldbank" / "gold_monthly_mirror.csv"
+    provenance = {"workbook_last_month": str(original.index.max().date()), "supplement_months": 0}
+    if mirror_path.exists() and original.index.max() < pd.Timestamp(END):
+        mirror = pd.read_csv(mirror_path, index_col=0)["Price"].astype(float)
+        mirror.index = pd.to_datetime(mirror.index)
+        overlap = pd.concat([original.rename("original"), mirror.rename("mirror")], axis=1).dropna()
+        gap = (overlap.original - overlap.mirror).abs()
+        if len(overlap) < 600 or gap.max() > .501:
+            raise ValueError("Gold supplement fails overlap check against uploaded workbook")
+        tail = mirror.loc[(mirror.index > original.index.max()) & (mirror.index <= pd.Timestamp(END))]
+        provenance.update(supplement_months=len(tail), overlap_months=len(overlap),
+                          maximum_overlap_gap_usd=float(gap.max()),
+                          supplement_url="https://github.com/datasets/gold-prices/blob/main/data/monthly.csv",
+                          limitation="Supplement is a third-party World Bank mirror rounded to whole dollars")
+        original = pd.concat([original, tail]).sort_index()
+    (WORK / "gold_source.json").write_text(json.dumps(provenance, indent=2) + "\n")
+    return original
 
 
 def load_spy_tail():
@@ -47,6 +66,10 @@ def load_spy_tail():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--stock-tail", choices=["spy", "shiller"], default="spy",
+                        help="SPY month-end tail or Shiller averages with carried dividend")
+    args = parser.parse_args()
     gs5, gs10, gs20, gs30 = (read_fred(s) for s in ("GS5", "GS10", "GS20", "GS30"))
     tb3, cpi = read_fred("TB3MS"), read_fred("CPIAUCSL")
     cpi = cpi.interpolate(limit=1)          # Oct 2025 has no CPI reading; fill halfway
@@ -70,20 +93,21 @@ if __name__ == "__main__":
     last_div = shd.index.max()
     spy = load_spy_tail()
     tail = r.index[(r.index > last_div) & (r.index <= END)]
-    if spy is not None:
+    if args.stock_tail == "spy" and spy is not None:
         stocks.loc[tail] = spy.reindex(tail)
         note = f"SPY total return after {last_div:%b %Y}"
     else:   # no EODHD key: Shiller price with the last known dividend carried forward
         p = sh["P"]
         stocks.loc[tail] = ((p + shd["D"].iloc[-1] / 12) / p.shift(1) - 1).reindex(tail)
-        note = f"Shiller price with last dividend carried forward after {last_div:%b %Y} (no SPY file)"
+        note = f"Shiller price with last dividend carried forward after {last_div:%b %Y} (monthly-average sensitivity or no SPY file)"
     r["stocks"] = stocks
     r["cpi"] = cpi
     r["infl"] = cpi.pct_change()
 
-    r = r.loc[START:END]
+    r = r.reindex(pd.date_range(START, END, freq="MS"))
     missing = r.isna().sum()
     if missing.sum():
         sys.exit(f"missing values:\n{missing[missing > 0]}")
     r.to_csv(WORK / "returns.csv")
+    (WORK / "stock_source.txt").write_text(note + "\n")
     print(f"returns.csv: {len(r)} months, {r.index.min():%b %Y} to {r.index.max():%b %Y}; stocks: {note}")
