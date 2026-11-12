@@ -9,6 +9,7 @@ from common import (RAW, WORK, RESULTS, SLEEVES, read_fred, month_end,
                     par_bond_return, stats, sleeve_return, portfolio_return,
                     window_return, find_drops, pct)
 from build_returns import load_shiller
+import openpyxl
 
 lines = []
 rpath = WORK / "returns.csv"
@@ -23,7 +24,19 @@ y20 = y20.fillna(y30.reindex(y20.index))
 gmonthly = ((y5 + y10 + y20) / 3).shift(1) / 1200
 text_path = RAW / "tsp" / "g-fund-rates-of-return.xls"
 reference = RESULTS / "check_gfund_vs_tsp.csv"
-if text_path.exists():
+xlsx_path = RAW / "tsp" / "g-fund-rates-of-return.xlsx"
+if xlsx_path.exists():
+    wb = openpyxl.load_workbook(xlsx_path, read_only=True, data_only=True)
+    values = {}
+    for row in wb["Annual Returns"].values:
+        year = str(row[0]).strip()
+        if year.isdigit() and len(year) == 4 and isinstance(row[1], (int, float)):
+            values[int(year)] = float(row[1])
+    tsp = pd.Series(values).sort_index()
+    if tsp.empty:
+        raise ValueError("No complete annual return rows in TSP workbook")
+    source = "user-supplied XLSX (heading cites TSP / Stock Analysis / TSP Folio; not verified as a direct TSP export)"
+elif text_path.exists():
     text = text_path.read_text(encoding="utf-8-sig")
     cells = [[html.unescape(re.sub("<.*?>", "", c)).strip()
               for c in re.findall(r"<t[dh].*?>(.*?)</t[dh]>", row, re.S)]

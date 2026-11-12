@@ -3,6 +3,7 @@ Main test uses monthly averages (Shiller, World Bank, FRED monthly series).
 Output: data/work/returns.csv"""
 import sys
 import argparse
+import json
 import numpy as np
 import openpyxl
 import pandas as pd
@@ -35,7 +36,24 @@ def load_gold():
     for r in rows[header + 2:]:
         if r[0] and isinstance(r[col], (int, float)):
             out[pd.Timestamp(int(r[0][:4]), int(r[0][5:7]), 1)] = float(r[col])
-    return pd.Series(out).sort_index()
+    original = pd.Series(out).sort_index()
+    mirror_path = RAW / "worldbank" / "gold_monthly_mirror.csv"
+    provenance = {"workbook_last_month": str(original.index.max().date()), "supplement_months": 0}
+    if mirror_path.exists() and original.index.max() < pd.Timestamp(END):
+        mirror = pd.read_csv(mirror_path, index_col=0)["Price"].astype(float)
+        mirror.index = pd.to_datetime(mirror.index)
+        overlap = pd.concat([original.rename("original"), mirror.rename("mirror")], axis=1).dropna()
+        gap = (overlap.original - overlap.mirror).abs()
+        if len(overlap) < 600 or gap.max() > .501:
+            raise ValueError("Gold supplement fails overlap check against uploaded workbook")
+        tail = mirror.loc[(mirror.index > original.index.max()) & (mirror.index <= pd.Timestamp(END))]
+        provenance.update(supplement_months=len(tail), overlap_months=len(overlap),
+                          maximum_overlap_gap_usd=float(gap.max()),
+                          supplement_url="https://github.com/datasets/gold-prices/blob/main/data/monthly.csv",
+                          limitation="Supplement is a third-party World Bank mirror rounded to whole dollars")
+        original = pd.concat([original, tail]).sort_index()
+    (WORK / "gold_source.json").write_text(json.dumps(provenance, indent=2) + "\n")
+    return original
 
 
 def load_spy_tail():
@@ -81,7 +99,7 @@ if __name__ == "__main__":
     else:   # no EODHD key: Shiller price with the last known dividend carried forward
         p = sh["P"]
         stocks.loc[tail] = ((p + shd["D"].iloc[-1] / 12) / p.shift(1) - 1).reindex(tail)
-        note = f"Shiller price with last dividend carried forward after {last_div:%b %Y} (no SPY file)"
+        note = f"Shiller price with last dividend carried forward after {last_div:%b %Y} (monthly-average sensitivity or no SPY file)"
     r["stocks"] = stocks
     r["cpi"] = cpi
     r["infl"] = cpi.pct_change()

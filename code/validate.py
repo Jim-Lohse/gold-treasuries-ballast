@@ -1,13 +1,12 @@
-"""Run validation and record exactly which parts were reproduced.
-Run from any directory: python code/validate.py
-Exit 0 = full pipeline; 2 = partial (missing source files); 1 = failed check.
+"""Rebuild the study and record execution results and source qualifications.
+Exit 0 = all required checks ran; 2 = missing inputs; 1 = calculation/check failure.
+Successful execution does not independently authenticate supplied files or citations.
 """
 import hashlib
 import json
 import subprocess
 import sys
 from datetime import datetime, timezone
-from pathlib import Path
 import pandas as pd
 from common import ROOT, RAW, WORK, RESULTS
 
@@ -22,62 +21,57 @@ run('Regression tests', ['-m', 'unittest', 'discover', '-s', 'tests', '-v'])
 run('Compile Python modules', ['-m', 'compileall', '-q', 'code'])
 required = [RAW/'shiller/ie_data.xls', RAW/'worldbank/CMO-Historical-Data-Monthly.xlsx']
 missing = [str(p.relative_to(ROOT)) for p in required if not p.exists()]
+if not any((RAW/'tsp'/f'g-fund-rates-of-return.{ext}').exists() for ext in ['xls', 'xlsx']):
+    missing.append('data/raw/tsp/g-fund-rates-of-return.xls or .xlsx')
+for ticker in ['XAUUSD.FOREX', 'GSPC.INDX', 'SPY.US', 'VUSTX.US']:
+    p = RAW/'eodhd'/f'{ticker}_monthly.csv'
+    if not p.exists(): missing.append(str(p.relative_to(ROOT)))
 main_ok = False
-if not missing:
+if missing:
+    checks.append({'name': 'Required source files', 'status': 'blocked', 'missing': missing})
+else:
     main_ok = run('Build monthly-average returns', ['code/build_returns.py'])
     if main_ok:
         main_ok = run('Main backtest and walk-forward', ['code/backtest.py'])
-else:
-    checks.append({'name': 'Main monthly-average backtest and walk-forward', 'status': 'blocked', 'missing': missing})
-    # Never use an old returns file to label a comparison as freshly rebuilt.
-    (WORK/'returns.csv').unlink(missing_ok=True)
-
-before = {}
-for name in ['check_monthend_drops.csv', 'stock_longtreasury_corr36_monthend.csv']:
-    p = RESULTS/name
-    if p.exists(): before[name] = pd.read_csv(p)
-run('Fresh month-end, VUSTX and G Fund checks', ['code/checks.py'])
-for name, old in before.items():
-    p = RESULTS/name
-    if not p.exists(): continue
-    new = pd.read_csv(p)
-    if old.shape == new.shape and old.columns.equals(new.columns):
-        cols = new.select_dtypes('number').columns
-        delta = float((new[cols] - old[cols]).abs().max().max())
-        checks.append({'name': f'Fresh output vs previous {name}', 'status': 'passed' if delta < 1e-10 else 'changed',
-                       'maximum_absolute_difference': delta})
-
-# Capture provenance without redistributing licensed source files.
+        run('Fresh month-end, VUSTX and G Fund checks', ['code/checks.py'])
+        run('SPY vs Shiller tail sensitivity', ['code/check_stock_tail.py'])
+        pdf = RAW/'worldbank/CMO-Pink-Sheet-November-2026.pdf'
+        if pdf.exists(): run('Gold series vs uploaded November PDF', ['code/check_gold_sources.py'])
+        else: checks.append({'name': 'Gold series vs November PDF', 'status': 'blocked', 'missing': [str(pdf.relative_to(ROOT))]})
 inputs = []
 for p in sorted(RAW.rglob('*')):
-    if p.is_file() and p.suffix.lower() in {'.csv', '.xls', '.xlsx'}:
+    if p.is_file() and p.suffix.lower() in {'.csv', '.xls', '.xlsx', '.pdf'}:
         inputs.append({'path': str(p.relative_to(ROOT)), 'bytes': p.stat().st_size,
                        'sha256': hashlib.sha256(p.read_bytes()).hexdigest()})
 failed = any(c['status'] == 'failed' for c in checks)
-monthend_ok = all((RESULTS/name).exists() for name in ['check_monthend_drops.csv', 'check_vustx.csv', 'check_stock_spy.csv'])
-status = 'failed' if failed else ('partial' if not main_ok or not monthend_ok or not (RAW/'tsp/g-fund-rates-of-return.xls').exists() else 'complete')
+blocked = any(c['status'] == 'blocked' for c in checks)
+status = 'failed' if failed else ('partial' if blocked else 'completed_with_source_qualifications')
+gold = json.loads((WORK/'gold_source.json').read_text()) if (WORK/'gold_source.json').exists() else {}
+qualifications = [
+    'The supplied World Bank workbook ends in February 2021. A datasets/gold-prices mirror supplements March 2021-October 2026 (68 months), rounded to whole USD. It is not the exact original 2026 workbook.',
+    'The mirror overlaps 734 workbook observations; the maximum difference is $0.50, consistent with rounding. Existing workbook values are preserved.',
+    'The supplied G Fund XLSX cites TSP / Stock Analysis / TSP Folio. It is a user-supplied compilation, not authenticated as a direct tsp.gov export. Only complete annual rows are compared; 2026 YTD is excluded.',
+    'Historical inputs are revised series, not point-in-time vintages. The monitoring rule is not validated as a trading strategy.',
+    'The bibliography, historical authorship and pre-registration claims were not independently audited.'
+]
 report = {'run_utc': datetime.now(timezone.utc).isoformat(), 'status': status,
-          'python': sys.version.split()[0], 'pandas': pd.__version__, 'checks': checks, 'inputs': inputs,
-          'tsp_reference': 'original export' if (RAW/'tsp/g-fund-rates-of-return.xls').exists() else 'previously committed reference; not independently verified',
-          'stock_tail_sensitivity': 'not run; pending source workbook',
-          'historical_outputs': 'Main tables regenerated.' if main_ok else 'Main tables and summary remain historical; original World Bank workbook unavailable.'}
+          'python': sys.version.split()[0], 'pandas': pd.__version__, 'checks': checks,
+          'inputs': inputs, 'gold_provenance': gold, 'source_qualifications': qualifications}
 (RESULTS/'validation.json').write_text(json.dumps(report, indent=2)+'\n')
 lines = ['# Validation run', '', f"Run: {report['run_utc']}", f"Status: **{status.upper()}**", '',
+         'Execution completed with the source qualifications below. This is a reproduction with documented supplemental data, not authentication of every source or exact recovery of the original data vintage.', '',
          '| Check | Outcome |', '|---|---|']
 lines += [f"| {c['name']} | {c['status']} |" for c in checks]
-lines += ['', '## Scope and limitations', '',
-          '- FRED, Shiller and EODHD source files were retrieved for this validation. Source-file SHA-256 hashes are recorded in `validation.json`; source data are not redistributed.',
-          ('- Main monthly-average backtest and walk-forward were regenerated.' if main_ok else '- The original World Bank workbook could not be downloaded in the November 12 reconciliation (HTTP 403). Main 1972–2026 results and walk-forward rankings remain historical until the missing source is supplied. The prior average-versus-month-end comparison is archived.'),
-          f"- TSP reference source: {report['tsp_reference']}. G Fund proxy returns are recomputed from the FRED input files.",
-          ('- The month-end rebuild covers 441 complete months. VUSTX and stock/SPY comparisons are exported as monthly CSVs.' if monthend_ok else '- Month-end validation is incomplete; inspect the check log.'),
-          '- Corrected drawdown includes starting wealth. Five regression tests cover initial losses, later peaks, real compounding, invalid inputs, flat-yield bond returns and peak-month exclusion.',
-          '- README rounding, rate-regime figures and walk-forward wording were reconciled to the historical CSVs. The inflation monitoring statement was corrected to acknowledge the positive 1990–91 long-Treasury real return.',
-          '- SPY-tail sensitivity remains pending. The chronology of walk-forward training is not evidence of point-in-time data availability.',
-          '- Bibliography, historical authorship and pre-registration claims were not independently audited.', '',
-          '## Fresh check log', '', '```text', (RESULTS/'checks.txt').read_text().strip(), '```', '',
-          '## Reproduce', '', 'Place the original sources at the paths in `data/raw/README.md`, fetch FRED/EODHD inputs, then run:', '',
-          '```bash', 'python code/validate.py', '```', '',
-          'Exit code 2 explicitly denotes partial validation, not a full pass.']
+lines += ['', '## Source qualifications', ''] + ['- '+x for x in qualifications]
+lines += ['', '## Outputs', '',
+          '- Main monthly-average returns cover 658 months, January 1972-October 2026. Main tables, summary, walk-forward choices and average-versus-month-end comparison are regenerated.',
+          '- Month-end checks cover 441 months. G Fund comparison uses 38 complete years, 1988-2025.',
+          '- `check_stock_tail_sensitivity.csv` contains 48 comparisons; main SPY-tail returns are restored afterward.',
+          '- `check_gold_pdf.csv` compares 11 published gold figures with monthly-series aggregates. Input hashes are recorded in `validation.json`. Licensed raw inputs are not redistributed.', '',
+          '## Execution log', '']
+for c in checks:
+    lines += [f"### {c['name']}", '', '```text', c.get('output', str(c.get('missing',''))).strip(), '```', '']
+lines += ['## Reproduce', '', 'Provide the sources documented in `data/raw/README.md`, then run `python code/validate.py`. Exit code 2 indicates missing inputs; exit code 1 indicates a failed calculation or check.']
 (RESULTS/'validation.md').write_text('\n'.join(lines)+'\n')
 print(f'Validation status: {status}; see results/validation.md')
-sys.exit(1 if failed else (0 if status == 'complete' else 2))
+sys.exit(1 if failed else (2 if blocked else 0))

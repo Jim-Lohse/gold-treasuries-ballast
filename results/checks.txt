@@ -1,4 +1,4 @@
-G FUND MODEL VS TSP, 2003-2025 (23 years), source: previously committed TSP reference values; original export NOT independently verified: average absolute gap 0.10 points; largest 0.33 (2011); correlation 0.995; compounded TSP 99.1% vs model 101.6%
+G FUND MODEL VS TSP, 1988-2025 (38 years), source: user-supplied XLSX (heading cites TSP / Stock Analysis / TSP Folio; not verified as a direct TSP export): average absolute gap 0.10 points; largest 0.33 (2011); correlation 0.998; compounded TSP 445.6% vs model 448.7%
 Month-end rebuild PASSED: 441 complete months, Feb 1990-Oct 2026.
 
 MONTH-END STOCK FALLS OF 10%+ (%)
@@ -10,7 +10,6 @@ MONTH-END STOCK FALLS OF 10%+ (%)
 2018-09 2018-12   -13.5            4.2                            4.4                   6.2
 2019-12 2020-03   -19.4            2.6                            8.4                  12.5
 2021-12 2022-09   -23.9           -3.7                          -11.6                 -17.9
-Average-versus-month-end comparison SKIPPED: main returns unavailable; old comparison removed.
 Month-end 36-month correlation, Oct 2026: 0.39
 VUSTX check, 441 months: correlation 0.987; CAGR fund 5.45% / model 5.57%
   1998-06 to 1998-08: VUSTX +4.3% / model +4.3%
