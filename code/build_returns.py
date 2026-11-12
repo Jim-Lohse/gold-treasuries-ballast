@@ -2,6 +2,7 @@
 Main test uses monthly averages (Shiller, World Bank, FRED monthly series).
 Output: data/work/returns.csv"""
 import sys
+import argparse
 import numpy as np
 import openpyxl
 import pandas as pd
@@ -47,6 +48,10 @@ def load_spy_tail():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--stock-tail", choices=["spy", "shiller"], default="spy",
+                        help="SPY month-end tail or Shiller averages with carried dividend")
+    args = parser.parse_args()
     gs5, gs10, gs20, gs30 = (read_fred(s) for s in ("GS5", "GS10", "GS20", "GS30"))
     tb3, cpi = read_fred("TB3MS"), read_fred("CPIAUCSL")
     cpi = cpi.interpolate(limit=1)          # Oct 2025 has no CPI reading; fill halfway
@@ -70,7 +75,7 @@ if __name__ == "__main__":
     last_div = shd.index.max()
     spy = load_spy_tail()
     tail = r.index[(r.index > last_div) & (r.index <= END)]
-    if spy is not None:
+    if args.stock_tail == "spy" and spy is not None:
         stocks.loc[tail] = spy.reindex(tail)
         note = f"SPY total return after {last_div:%b %Y}"
     else:   # no EODHD key: Shiller price with the last known dividend carried forward
@@ -81,9 +86,10 @@ if __name__ == "__main__":
     r["cpi"] = cpi
     r["infl"] = cpi.pct_change()
 
-    r = r.loc[START:END]
+    r = r.reindex(pd.date_range(START, END, freq="MS"))
     missing = r.isna().sum()
     if missing.sum():
         sys.exit(f"missing values:\n{missing[missing > 0]}")
     r.to_csv(WORK / "returns.csv")
+    (WORK / "stock_source.txt").write_text(note + "\n")
     print(f"returns.csv: {len(r)} months, {r.index.min():%b %Y} to {r.index.max():%b %Y}; stocks: {note}")

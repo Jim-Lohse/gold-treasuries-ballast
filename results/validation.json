@@ -1,0 +1,123 @@
+{
+  "run_utc": "2026-11-12T21:23:58.971256+00:00",
+  "status": "partial",
+  "python": "3.12.14",
+  "pandas": "2.2.3",
+  "checks": [
+    {
+      "name": "Regression tests",
+      "status": "passed",
+      "returncode": 0,
+      "output": "test_flat_yield_earns_coupon (test_math.MathTests.test_flat_yield_earns_coupon) ... ok\ntest_initial_loss_counts_as_drawdown (test_math.MathTests.test_initial_loss_counts_as_drawdown) ... ok\ntest_later_peak_and_real_compounding (test_math.MathTests.test_later_peak_and_real_compounding) ... ok\ntest_missing_month_is_rejected (test_math.MathTests.test_missing_month_is_rejected) ... ok\ntest_peak_month_is_excluded (test_math.MathTests.test_peak_month_is_excluded) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.007s\n\nOK\n"
+    },
+    {
+      "name": "Compile Python modules",
+      "status": "passed",
+      "returncode": 0,
+      "output": ""
+    },
+    {
+      "name": "Main monthly-average backtest and walk-forward",
+      "status": "blocked",
+      "missing": [
+        "data/raw/worldbank/CMO-Historical-Data-Monthly.xlsx"
+      ]
+    },
+    {
+      "name": "Fresh month-end, VUSTX and G Fund checks",
+      "status": "passed",
+      "returncode": 0,
+      "output": "G FUND MODEL VS TSP, 2003-2025 (23 years), source: previously committed TSP reference values; original export NOT independently verified: average absolute gap 0.10 points; largest 0.33 (2011); correlation 0.995; compounded TSP 99.1% vs model 101.6%\nMonth-end rebuild PASSED: 441 complete months, Feb 1990-Oct 2026.\n\nMONTH-END STOCK FALLS OF 10%+ (%)\n   peak  bottom  stocks  Gold + G Fund  Gold + G Fund + long Treasury  Gold + long Treasury\n1990-05 1990-10   -14.6            4.2                            3.4                   3.3\n1998-06 1998-08   -15.3           -3.0                           -0.6                  -1.3\n2000-08 2002-09   -44.7           14.2                           19.5                  23.7\n2007-10 2009-02   -50.8           12.9                           14.8                  19.2\n2018-09 2018-12   -13.5            4.2                            4.4                   6.2\n2019-12 2020-03   -19.4            2.6                            8.4                  12.5\n2021-12 2022-09   -23.9           -3.7                          -11.6                 -17.9\nAverage-versus-month-end comparison SKIPPED: main returns unavailable; old comparison removed.\nMonth-end 36-month correlation, Oct 2026: 0.39\nVUSTX check, 441 months: correlation 0.987; CAGR fund 5.45% / model 5.57%\n  1998-06 to 1998-08: VUSTX +4.3% / model +4.3%\n  2000-08 to 2002-09: VUSTX +30.5% / model +29.9%\n  2007-10 to 2009-02: VUSTX +15.6% / model +16.8%\n  2019-12 to 2020-03: VUSTX +20.8% / model +20.6%\n  2021-12 to 2022-09: VUSTX -28.7% / model -26.0%\nIndex plus dividends vs SPY: CAGR gap +0.07 percentage points (405 months).\n"
+    },
+    {
+      "name": "Fresh output vs previous check_monthend_drops.csv",
+      "status": "passed",
+      "maximum_absolute_difference": 0.0
+    },
+    {
+      "name": "Fresh output vs previous stock_longtreasury_corr36_monthend.csv",
+      "status": "passed",
+      "maximum_absolute_difference": 0.0
+    }
+  ],
+  "inputs": [
+    {
+      "path": "data/raw/eodhd/GSPC.INDX_monthly.csv",
+      "bytes": 12119,
+      "sha256": "85c7bdeaef00fa7212cf5e9f860e5a924edf826148898c3df246d4e142956a5f"
+    },
+    {
+      "path": "data/raw/eodhd/SPY.US_monthly.csv",
+      "bytes": 10751,
+      "sha256": "831ef6e6f65a5e9dd733da5625ed21fdc08e63eaf22a9437578de4f372f81728"
+    },
+    {
+      "path": "data/raw/eodhd/VUSTX.US_monthly.csv",
+      "bytes": 11331,
+      "sha256": "f5840f94a91dd6a480d4d3e914a0b2ebd40f5a7d1a635719cf540dfec718650d"
+    },
+    {
+      "path": "data/raw/eodhd/XAUUSD.FOREX_monthly.csv",
+      "bytes": 11416,
+      "sha256": "0b6bbb74271d5f8acb7bcac37574c6d4ee009b062160bc7e987fd9cb29b95ac2"
+    },
+    {
+      "path": "data/raw/fred/CPIAUCSL.csv",
+      "bytes": 17782,
+      "sha256": "c9be2d4909ffd28d91f07df5d113151b0fe7ba602144ee6fd453d3bc8426efde"
+    },
+    {
+      "path": "data/raw/fred/DGS10.csv",
+      "bytes": 269347,
+      "sha256": "0a19145416475025a3db81f1d24cddde626211cc098ccba2c22c4baf426c5bb4"
+    },
+    {
+      "path": "data/raw/fred/DGS20.csv",
+      "bytes": 262616,
+      "sha256": "6a634a74ad00687645c39e3ec4352663eca5269187120632307e4c9d9e9f8b8e"
+    },
+    {
+      "path": "data/raw/fred/DGS30.csv",
+      "bytes": 206941,
+      "sha256": "1b017c37afd6e51664634815c2fadad2cecef2f5bc2cd5bbdf113ca2d54559be"
+    },
+    {
+      "path": "data/raw/fred/DGS5.csv",
+      "bytes": 269173,
+      "sha256": "5af5c01a8e0c1af3aecaa77cdd0895933966e0d03c5fbbc6e59d0dfdffd16698"
+    },
+    {
+      "path": "data/raw/fred/GS10.csv",
+      "bytes": 14222,
+      "sha256": "018e609eb98c52ec8d2cf0ea9f8e1450c24974c31cca455cc19717a77703af78"
+    },
+    {
+      "path": "data/raw/fred/GS20.csv",
+      "bytes": 13898,
+      "sha256": "c5497c8b87c86ca334d3024322e6142a984af084184b9a5b1f82fd0531c925ec"
+    },
+    {
+      "path": "data/raw/fred/GS30.csv",
+      "bytes": 9646,
+      "sha256": "2eb0b74e9ccde39ee5072b1c35f32b0eaa16789c0a790c5db08c797e4a106493"
+    },
+    {
+      "path": "data/raw/fred/GS5.csv",
+      "bytes": 14214,
+      "sha256": "49e61dc82bac413c9ce0461b5b54eab8d588376f6b9cfa15c93c478760ba81a3"
+    },
+    {
+      "path": "data/raw/fred/TB3MS.csv",
+      "bytes": 17881,
+      "sha256": "33fae406051a658c316580f8e8b5e461157e6663bc03b35648cc7cd3e89ee26b"
+    },
+    {
+      "path": "data/raw/shiller/ie_data.xls",
+      "bytes": 1675264,
+      "sha256": "98a54927942e842ec07ffe73000998e793953708c345b6b27bb363e9ada8366a"
+    }
+  ],
+  "tsp_reference": "previously committed reference; not independently verified",
+  "stock_tail_sensitivity": "not run; pending source workbook",
+  "historical_outputs": "Main tables and summary remain historical; original World Bank workbook unavailable."
+}

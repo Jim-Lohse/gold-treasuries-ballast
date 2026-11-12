@@ -69,10 +69,14 @@ def portfolio_return(r, weights, stock_weight):
 
 
 def stats(x, infl):
+    if x.empty or not np.isfinite(x).all() or (x <= -1).any():
+        raise ValueError("Returns must be nonempty, finite, and greater than -100%")
+    if not np.isfinite(infl.reindex(x.index)).all():
+        raise ValueError("Inflation must cover every return month")
     idx = (1 + x).cumprod()
     years = len(x) / 12
     cagr = idx.iloc[-1] ** (1 / years) - 1
-    dd = (idx / idx.cummax() - 1).min()
+    dd = (idx / idx.cummax().clip(lower=1.0) - 1).min()
     real = (1 + x) / (1 + infl.loc[x.index]) - 1
     real_cagr = (1 + real).prod() ** (1 / years) - 1
     return {"yearly_return": cagr, "real_yearly_return": real_cagr,
