@@ -21,3 +21,10 @@ The supplied November 2026 Pink Sheet is saved as `worldbank/CMO-Pink-Sheet-Nove
 The supplied `tsp/g-fund-rates-of-return.xlsx` contains an `Annual Returns` sheet with years in column A and decimal returns in column B. Its heading cites TSP / Stock Analysis / TSP Folio. It is treated as a supplied compilation, not authenticated as a direct TSP export. Complete 1988-2025 rows are used; the YTD row is excluded. The older HTML-in-XLS export remains supported.
 
 Run `python code/validate.py` to rebuild the backtest, walk-forward, month-end checks and SPY-tail sensitivity. The validator restores the primary SPY-tail returns after the sensitivity run. Input hashes and qualifications are saved in `results/validation.json`. Raw workbooks, PDFs and licensed EODHD prices are excluded from Git.
+
+## Source checks, November 22, 2026
+
+These checks were made after the November 12 run. No figure changed.
+
+- Gold: the current World Bank workbook, `CMO-Historical-Data-Monthly.xlsx` (updated November 3, 2026; 587,760 bytes; SHA-256 beginning `3c8d9d8dbb48342f`), runs from January 1960 to October 2026 and lists gold in whole dollars. All 68 months taken from the public mirror, March 2021 to October 2026, match it exactly. The 2021 workbook is kept for January 1972 to February 2021.
+- G Fund: the 38 annual returns in the supplied compilation, 1988 to 2025, match the `y` rows of tsp.gov's data file, https://www.tsp.gov/data/getMonthlyReturnsSummary.csv (data through October 31, 2026).
